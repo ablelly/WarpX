@@ -228,7 +228,8 @@ WarpX::FillBoundaryE ()
     {
         FillBoundaryE(lev);
     }
-  WarpX::exchanged_guards_E = true;
+    WarpX::exchanged_guards_E = true;
+  }
 }
 
 void
