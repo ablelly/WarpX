@@ -552,6 +552,23 @@ WarpX::WritePlotFile () const
                         MultiFab rho_new(*rho_fp[lev], amrex::make_alias, 1, 1);
                         VisMF::Write(rho_new, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "rho_fp"));
                     }
+                    if (plot_dive) {
+                        const BoxArray& ba = amrex::convert(boxArray(lev),IntVect::TheUnitVector());
+                        MultiFab dive(ba, DistributionMap(lev), 1, ngrow);
+                        ComputeDivE(dive, 0,
+                                    {Efield_aux[lev][0].get(), Efield_aux[lev][1].get(), Efield_aux[lev][2].get()},
+                                    WarpX::CellSize(lev), ngrow);
+                        //amrex::average_node_to_cellcenter(mf[lev], dcomp, dive, 0, 1, ngrow); // for boxlib variable
+                        VisMF::Write(dive, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "divE_aux"));
+                        ComputeDivE(dive, 0,
+                                    {Efield_fp[lev][0].get(), Efield_fp[lev][1].get(), Efield_fp[lev][2].get()},
+                                    WarpX::CellSize(lev), ngrow);
+                        //amrex::average_node_to_cellcenter(mf[lev], dcomp, dive, 0, 1, ngrow); // for boxlib variable
+                        VisMF::Write(dive, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "divE_fp"));
+                        if (lev == 0)
+                            varnames.push_back("divE");
+                    }
+
                 } else {
                     const DistributionMapping& dm = DistributionMap(lev);
                     MultiFab Ex(Efield_fp[lev][0]->boxArray(), dm, 1, 0);
@@ -587,6 +604,22 @@ WarpX::WritePlotFile () const
 			// for time synchronization
                         MultiFab::Copy(rho, *rho_fp[lev], 1, 0, 1, 0);
                         VisMF::Write(rho, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "rho_fp"));
+                    }
+                    if (plot_dive) {
+                        const BoxArray& ba = amrex::convert(boxArray(lev),IntVect::TheUnitVector());
+                        MultiFab dive(ba, DistributionMap(lev), 1, ngrow);
+                        ComputeDivE(dive, 0,
+                                    {Efield_aux[lev][0].get(), Efield_aux[lev][1].get(), Efield_aux[lev][2].get()},
+                                    WarpX::CellSize(lev), ngrow);
+                        //amrex::average_node_to_cellcenter(mf[lev], dcomp, dive, 0, 1, ngrow); // for boxlib variable
+                        VisMF::Write(dive, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "divE_aux"));
+                        ComputeDivE(dive, 0,
+                                    {Efield_fp[lev][0].get(), Efield_fp[lev][1].get(), Efield_fp[lev][2].get()},
+                                    WarpX::CellSize(lev), ngrow);
+                        //amrex::average_node_to_cellcenter(mf[lev], dcomp, dive, 0, 1, ngrow); // for boxlib variable
+                        VisMF::Write(dive, amrex::MultiFabFileFullPrefix(lev, raw_plotfilename, level_prefix, "divE_fp"));
+                        if (lev == 0)
+                            varnames.push_back("divE");
                     }
                 }
             }
