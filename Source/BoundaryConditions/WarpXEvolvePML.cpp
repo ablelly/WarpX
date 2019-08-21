@@ -90,8 +90,12 @@ WarpX::DampJPML ()
 void
 WarpX::DampJPML (int lev)
 {
+    // amrex::Print()<< "##### damp J in PML level "<< lev << " PML type FINE"<< std::endl;
     DampJPML(lev, PatchType::fine);
-    if (lev > 0) DampJPML(lev, PatchType::coarse);
+    if (lev > 0) {
+        // amrex::Print()<< "##### damp J in PML level "<< lev << " PML type  COARSE" << std::endl;
+        DampJPML(lev, PatchType::coarse);
+    }
 }
 
 void
@@ -100,10 +104,11 @@ WarpX::DampJPML (int lev, PatchType patch_type)
     if (!do_pml) return;
     if (!do_pml_j_damping) return;
 
-    BL_PROFILE("WarpX::DampJPML()");
+    // BL_PROFILE("WarpX::DampJPML()");
 
     if (pml[lev]->ok())
     {
+        // amrex::Print()<< "***** damp J *****"<< std::endl;
         const auto& pml_j = (patch_type == PatchType::fine) ? pml[lev]->Getj_fp() : pml[lev]->Getj_cp();
         const auto& sigba = (patch_type == PatchType::fine) ? pml[lev]->GetMultiSigmaBox_fp()
                                                               : pml[lev]->GetMultiSigmaBox_cp();
